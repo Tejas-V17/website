@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubik's Cube Password</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .floating-cubes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .cube {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            opacity: 0.1;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .cube:nth-child(1) { background: #ff5733; top: 10%; left: 10%; animation-delay: 0s; }
+        .cube:nth-child(2) { background: #33ff57; top: 20%; left: 80%; animation-delay: 1s; }
+        .cube:nth-child(3) { background: #3357ff; top: 70%; left: 15%; animation-delay: 2s; }
+        .cube:nth-child(4) { background: #ffff33; top: 80%; left: 70%; animation-delay: 3s; }
+        .cube:nth-child(5) { background: #ac2300; top: 40%; left: 5%; animation-delay: 4s; }
+        .cube:nth-child(6) { background: #33ffff; top: 60%; left: 90%; animation-delay: 5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(90deg); }
+            50% { transform: translateY(0px) rotate(180deg); }
+            75% { transform: translateY(20px) rotate(270deg); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .password-container {
+            position: relative;
+            width: 350px;
+            height: 60px;
+        }
+
+        .password-input {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #2a2a2a, #1a1a1a);
+            border: 3px solid transparent;
+            border-radius: 15px;
+            padding: 0 20px;
+            font-size: 16px;
+            color: #fff;
+            outline: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .password-input::placeholder {
+            color: #888;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus::placeholder {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .animated-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 15px;
+            padding: 3px;
+            background: linear-gradient(45deg, #ff5733, #33ff57, #3357ff, #ffff33, #ff33ff, #33ffff);
+            background-size: 300% 300%;
+            animation: rainbow 3s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .animated-border::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            background: linear-gradient(45deg, #2a2a2a, #1a1a1a);
+            border-radius: 12px;
+            z-index: -1;
+        }
+
+        .password-input:focus + .animated-border,
+        .password-container:hover .animated-border {
+            opacity: 1;
+        }
+
+        .password-input:focus {
+            background: linear-gradient(45deg, #3a3a3a, #2a2a2a);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes rainbow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .corner-cubes {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            z-index: 5;
+        }
+
+        .corner-cubes:nth-child(1) {
+            top: -10px;
+            left: -10px;
+            background: #ac2300;
+            animation: spin 4s linear infinite;
+        }
+
+        .corner-cubes:nth-child(2) {
+            top: -10px;
+            right: -10px;
+            background: #33ff57;
+            animation: spin 4s linear infinite reverse;
+        }
+
+        .corner-cubes:nth-child(3) {
+            bottom: -10px;
+            left: -10px;
+            background: #3357ff;
+            animation: spin 4s linear infinite;
+        }
+
+        .corner-cubes:nth-child(4) {
+            bottom: -10px;
+            right: -10px;
+            background: #ffff33;
+            animation: spin 4s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .password-input:focus ~ .corner-cubes {
+            animation-duration: 1s;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-cubes">
+        <div class="cube"></div>
+        <div class="cube"></div>
+        <div class="cube"></div>
+        <div class="cube"></div>
+        <div class="cube"></div>
+        <div class="cube"></div>
+    </div>
+
+    <div class="main-container">
+        <div class="password-container">
+            <input type="password" class="password-input" placeholder="●●●●●●●●●●">
+            <div class="animated-border"></div>
+            <div class="corner-cubes"></div>
+            <div class="corner-cubes"></div>
+            <div class="corner-cubes"></div>
+            <div class="corner-cubes"></div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.querySelector('.password-input');
+        const container = document.querySelector('.password-container');
+
+        input.addEventListener('click', function(e) {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.width = '10px';
+            ripple.style.height = '10px';
+
+            container.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (input.value === 'UUMMMAH') {
+                    window.location.href = 'https://example.com';
+                } else {
+                    // Simple shake animation for wrong password
+                    input.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
+                }
+            }
+        });
+
+        // Add shake animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 20%, 40%, 60%, 80% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
